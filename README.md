@@ -1,6 +1,6 @@
 # Visa Requirements Checker
 
-A modern, responsive web application that allows users to check visa requirements for international travel using the Travel Buddy API.
+A modern, responsive web application that allows users to check visa requirements for international travel using the Travel Buddy API. Now with **server-side logging** to collect logs from all users in centralized files.
 
 ## Features
 
@@ -10,9 +10,10 @@ A modern, responsive web application that allows users to check visa requirement
 - **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
 - **Visual Status Indicators**: Color-coded visa status with appropriate icons
 - **Error Handling**: User-friendly error messages and loading states
-- **Comprehensive Logging**: Automatic logging of all requests, responses, and errors
+- **Server-Side Logging**: Centralized logging system that collects data from all users
 - **Capital City Information**: Displays destination country's capital city and additional details
-- **Log Management**: Admin panel for viewing, exporting, and managing application logs
+- **Advanced Log Management**: Admin panel for viewing, exporting, and managing application logs
+- **Fallback Support**: Graceful degradation to localStorage when server is unavailable
 
 ## How It Works
 
@@ -51,10 +52,16 @@ This application uses the [Travel Buddy Visa Requirements API](https://travel-bu
 
 ```
 VisaRules/
-├── index.html          # Main HTML file
-├── styles.css          # CSS styles and responsive design
+├── index.html          # Main application interface
+├── styles.css          # CSS styling and responsive design
 ├── script.js           # JavaScript functionality and API integration
 ├── logs.html           # Administrative log viewer and management panel
+├── server.js           # Node.js/Express server for server-side logging
+├── package.json        # Node.js dependencies and scripts
+├── logs/               # Server log files (created automatically)
+│   ├── visa_requests.jsonl  # Request and response logs
+│   ├── visa_errors.jsonl    # Error logs
+│   └── stats.json           # Statistics file
 └── README.md           # Project documentation
 ```
 
@@ -64,11 +71,27 @@ VisaRules/
 - A modern web browser
 - Internet connection for API calls
 - RapidAPI account (free tier available)
+- **For server-side logging**: Node.js (version 14 or higher)
 
-### Installation
-1. Clone or download the project files
-2. Open `index.html` in your web browser
-3. Start checking visa requirements!
+### Installation Options
+
+#### Option 1: Server-Side Logging (Recommended)
+1. **Install Node.js** from [nodejs.org](https://nodejs.org/)
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+3. **Start the server**:
+   ```bash
+   npm start
+   ```
+4. **Open the application** at `http://localhost:3000`
+
+#### Option 2: Client-Side Only
+1. **Open `index.html`** directly in a web browser
+2. **Use the application** with localStorage logging only
+
+**Note**: Server-side logging provides centralized log collection from all users, while client-side only stores logs locally in the browser.
 
 ### API Key Setup
 The application is pre-configured with a RapidAPI key. To use your own:
@@ -96,33 +119,53 @@ The application is pre-configured with a RapidAPI key. To use your own:
 - **Font Awesome**: Icons for better UX
 - **Google Fonts**: Inter font family for typography
 
-## Logging and Monitoring
+## Server-Side Logging
 
-The application includes comprehensive logging functionality:
+The application now includes a comprehensive server-side logging system that collects data from all users in centralized files.
 
-### Automatic Logging
-- **Request Logging**: All user requests are automatically logged with timestamps
-- **Response Logging**: API responses are logged for monitoring and debugging
-- **Error Logging**: Failed requests and errors are captured with detailed information
-- **User Information**: Browser details and user agent information are included
+### Features
+- **Centralized Storage**: All logs are stored in server files, not just browser localStorage
+- **Multi-User Support**: Collects logs from all users accessing the application
+- **Automatic Fallback**: Gracefully falls back to localStorage if server is unavailable
+- **Real-time Statistics**: Live statistics and file size monitoring
+- **Export Capabilities**: Download logs in JSONL format for analysis
 
-### Log Management
-- **Local Storage**: Logs are stored in browser's localStorage (up to 100 entries)
-- **Export Functionality**: Logs can be exported as text files for analysis
-- **Admin Panel**: Access `logs.html` for a dedicated log management interface
-- **Statistics**: View request counts, response rates, and error statistics
+### Log Files
+The server creates the following log files in the `logs/` directory:
+- **`visa_requests.jsonl`**: All requests and responses (JSON Lines format)
+- **`visa_errors.jsonl`**: All error logs
+- **`stats.json`**: Real-time statistics and counters
 
-### Log Structure
+### Log Entry Structure
 Each log entry includes:
 - **Timestamp**: ISO format timestamp
 - **Type**: REQUEST, RESPONSE, or ERROR
 - **Data**: Detailed information about the operation
 - **User Agent**: Browser and device information
+- **IP Address**: User's IP address (for server logs)
+- **Request ID**: Unique identifier for each request
 
-### Accessing Logs
-1. **Export from Main App**: Click the download icon in the navigation bar
-2. **Admin Panel**: Open `logs.html` for detailed log viewing and management
-3. **Browser Console**: Logs are also output to the browser console for debugging
+### API Endpoints
+The server provides the following endpoints:
+- **`POST /api/logs`**: Submit new log entries
+- **`GET /api/logs`**: Retrieve logs with pagination
+- **`GET /api/stats`**: Get real-time statistics
+- **`GET /api/logs/export`**: Export logs as downloadable files
+- **`DELETE /api/logs`**: Clear all logs
+
+### Admin Panel
+Access the admin panel at `http://localhost:3000/logs.html` to:
+- View real-time logs from all users
+- Monitor statistics and file sizes
+- Export logs in various formats
+- Clear logs when needed
+
+### Fallback Support
+If the server is unavailable, the application automatically:
+- Falls back to localStorage logging
+- Continues to function normally
+- Attempts to reconnect to server on next request
+- Provides clear feedback about connection status
 
 ## API Rate Limits
 

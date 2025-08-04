@@ -15,8 +15,18 @@ const LOG_CONFIG = {
     maxLogEntries: 1000
 };
 
+// Server Configuration
+const SERVER_CONFIG = {
+    baseUrl: window.location.origin, // Automatically detect server URL
+    endpoints: {
+        logs: '/api/logs',
+        stats: '/api/stats',
+        export: '/api/logs/export'
+    }
+};
+
 // Logging Functions
-function logRequest(requestData) {
+async function logRequest(requestData) {
     const logEntry = {
         timestamp: new Date().toISOString(),
         type: 'REQUEST',
@@ -24,8 +34,103 @@ function logRequest(requestData) {
     };
     
     try {
-        // In a real application, you would send this to a server
-        // For now, we'll store in localStorage and console
+        // Send to server
+        const response = await fetch(`${SERVER_CONFIG.baseUrl}${SERVER_CONFIG.endpoints.logs}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                type: 'REQUEST',
+                data: requestData
+            })
+        });
+
+        if (response.ok) {
+            console.log('📝 Logged Request to server:', logEntry);
+        } else {
+            console.error('Failed to log request to server:', response.status);
+            // Fallback to localStorage if server is unavailable
+            fallbackToLocalStorage(logEntry);
+        }
+    } catch (error) {
+        console.error('Error logging request to server:', error);
+        // Fallback to localStorage if server is unavailable
+        fallbackToLocalStorage(logEntry);
+    }
+}
+
+async function logResponse(responseData) {
+    const logEntry = {
+        timestamp: new Date().toISOString(),
+        type: 'RESPONSE',
+        data: responseData
+    };
+    
+    try {
+        // Send to server
+        const response = await fetch(`${SERVER_CONFIG.baseUrl}${SERVER_CONFIG.endpoints.logs}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                type: 'RESPONSE',
+                data: responseData
+            })
+        });
+
+        if (response.ok) {
+            console.log('📝 Logged Response to server:', logEntry);
+        } else {
+            console.error('Failed to log response to server:', response.status);
+            // Fallback to localStorage if server is unavailable
+            fallbackToLocalStorage(logEntry);
+        }
+    } catch (error) {
+        console.error('Error logging response to server:', error);
+        // Fallback to localStorage if server is unavailable
+        fallbackToLocalStorage(logEntry);
+    }
+}
+
+async function logError(errorData) {
+    const logEntry = {
+        timestamp: new Date().toISOString(),
+        type: 'ERROR',
+        data: errorData
+    };
+    
+    try {
+        // Send to server
+        const response = await fetch(`${SERVER_CONFIG.baseUrl}${SERVER_CONFIG.endpoints.logs}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                type: 'ERROR',
+                data: errorData
+            })
+        });
+
+        if (response.ok) {
+            console.log('📝 Logged Error to server:', logEntry);
+        } else {
+            console.error('Failed to log error to server:', response.status);
+            // Fallback to localStorage if server is unavailable
+            fallbackToLocalStorage(logEntry);
+        }
+    } catch (error) {
+        console.error('Error logging error to server:', error);
+        // Fallback to localStorage if server is unavailable
+        fallbackToLocalStorage(logEntry);
+    }
+}
+
+// Fallback function for when server is unavailable
+function fallbackToLocalStorage(logEntry) {
+    try {
         const logs = JSON.parse(localStorage.getItem('visaLogs') || '[]');
         logs.push(logEntry);
         
@@ -35,57 +140,43 @@ function logRequest(requestData) {
         }
         
         localStorage.setItem('visaLogs', JSON.stringify(logs));
-        console.log('📝 Logged Request:', logEntry);
+        console.log('📝 Fallback: Logged to localStorage:', logEntry);
     } catch (error) {
-        console.error('Error logging request:', error);
+        console.error('Error logging to localStorage:', error);
     }
 }
 
-function logResponse(responseData) {
-    const logEntry = {
-        timestamp: new Date().toISOString(),
-        type: 'RESPONSE',
-        data: responseData
-    };
-    
+async function exportLogs() {
     try {
-        const logs = JSON.parse(localStorage.getItem('visaLogs') || '[]');
-        logs.push(logEntry);
-        
-        if (logs.length > 100) {
-            logs.splice(0, logs.length - 100);
+        // Try to export from server first
+        const response = await fetch(`${SERVER_CONFIG.baseUrl}${SERVER_CONFIG.endpoints.export}`, {
+            method: 'GET'
+        });
+
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `visa_logs_${new Date().toISOString().split('T')[0]}.jsonl`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            console.log('📁 Logs exported from server successfully');
+        } else {
+            // Fallback to localStorage export
+            fallbackExportFromLocalStorage();
         }
-        
-        localStorage.setItem('visaLogs', JSON.stringify(logs));
-        console.log('📝 Logged Response:', logEntry);
     } catch (error) {
-        console.error('Error logging response:', error);
+        console.error('Error exporting logs from server:', error);
+        // Fallback to localStorage export
+        fallbackExportFromLocalStorage();
     }
 }
 
-function logError(errorData) {
-    const logEntry = {
-        timestamp: new Date().toISOString(),
-        type: 'ERROR',
-        data: errorData
-    };
-    
-    try {
-        const logs = JSON.parse(localStorage.getItem('visaLogs') || '[]');
-        logs.push(logEntry);
-        
-        if (logs.length > 100) {
-            logs.splice(0, logs.length - 100);
-        }
-        
-        localStorage.setItem('visaLogs', JSON.stringify(logs));
-        console.log('📝 Logged Error:', logEntry);
-    } catch (error) {
-        console.error('Error logging error:', error);
-    }
-}
-
-function exportLogs() {
+// Fallback export function for when server is unavailable
+function fallbackExportFromLocalStorage() {
     try {
         const logs = JSON.parse(localStorage.getItem('visaLogs') || '[]');
         const logText = logs.map(log => 
@@ -96,15 +187,15 @@ function exportLogs() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `visa_logs_${new Date().toISOString().split('T')[0]}.log`;
+        a.download = `visa_logs_local_${new Date().toISOString().split('T')[0]}.log`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         
-        console.log('📁 Logs exported successfully');
+        console.log('📁 Fallback: Logs exported from localStorage');
     } catch (error) {
-        console.error('Error exporting logs:', error);
+        console.error('Error exporting logs from localStorage:', error);
     }
 }
 

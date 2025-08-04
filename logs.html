@@ -233,77 +233,196 @@
     </div>
 
     <script>
-        // Load and display logs
-        function loadLogs() {
+        // Server Configuration
+        const SERVER_CONFIG = {
+            baseUrl: window.location.origin,
+            endpoints: {
+                logs: '/api/logs',
+                stats: '/api/stats',
+                export: '/api/logs/export'
+            }
+        };
+
+        let currentLogs = [];
+        let currentOffset = 0;
+        const logsPerPage = 50;
+
+        // Load logs from server
+        async function loadLogs() {
             try {
-                const logs = JSON.parse(localStorage.getItem('visaLogs') || '[]');
-                const logsContent = document.getElementById('logsContent');
-                const stats = document.getElementById('stats');
+                showLoading();
                 
-                // Update statistics
-                const requestCount = logs.filter(log => log.type === 'REQUEST').length;
-                const responseCount = logs.filter(log => log.type === 'RESPONSE').length;
-                const errorCount = logs.filter(log => log.type === 'ERROR').length;
-                const totalCount = logs.length;
+                // Try to load from server first
+                const response = await fetch(`${SERVER_CONFIG.baseUrl}${SERVER_CONFIG.endpoints.logs}?limit=${logsPerPage}&offset=${currentOffset}`);
                 
-                stats.innerHTML = `
-                    <div class="stat-card">
-                        <div class="stat-number">${totalCount}</div>
-                        <div class="stat-label">Total Logs</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">${requestCount}</div>
-                        <div class="stat-label">Requests</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">${responseCount}</div>
-                        <div class="stat-label">Responses</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">${errorCount}</div>
-                        <div class="stat-label">Errors</div>
-                    </div>
-                `;
-                
-                if (logs.length === 0) {
-                    logsContent.innerHTML = `
-                        <div class="no-logs">
-                            <i class="fas fa-file-alt" style="font-size: 3rem; margin-bottom: 1rem; color: #d1d5db;"></i>
-                            <h3>No logs found</h3>
-                            <p>Start using the visa checker to generate logs</p>
-                        </div>
-                    `;
-                    return;
+                if (response.ok) {
+                    const data = await response.json();
+                    currentLogs = data.logs;
+                    displayLogs(currentLogs);
+                    updateStatsFromServer();
+                    hideLoading();
+                } else {
+                    // Fallback to localStorage
+                    console.warn('Server unavailable, falling back to localStorage');
+                    loadLogsFromLocalStorage();
                 }
-                
-                // Display logs in reverse chronological order
-                const sortedLogs = logs.slice().reverse();
-                logsContent.innerHTML = sortedLogs.map(log => `
-                    <div class="log-entry ${log.type.toLowerCase()}">
-                        <div class="log-timestamp">${new Date(log.timestamp).toLocaleString()}</div>
-                        <div class="log-type ${log.type.toLowerCase()}">${log.type}</div>
-                        <div class="log-data">${JSON.stringify(log.data, null, 2)}</div>
-                    </div>
-                `).join('');
-                
             } catch (error) {
-                console.error('Error loading logs:', error);
-                document.getElementById('logsContent').innerHTML = `
-                    <div class="no-logs">
-                        <h3>Error loading logs</h3>
-                        <p>${error.message}</p>
-                    </div>
-                `;
+                console.error('Error loading logs from server:', error);
+                // Fallback to localStorage
+                loadLogsFromLocalStorage();
             }
         }
-        
+
+        // Fallback: Load logs from localStorage
+        function loadLogsFromLocalStorage() {
+            try {
+                const logs = JSON.parse(localStorage.getItem('visaLogs') || '[]');
+                currentLogs = logs.reverse(); // Show newest first
+                displayLogs(currentLogs);
+                updateStatsFromLocalStorage(logs);
+                hideLoading();
+            } catch (error) {
+                console.error('Error loading logs from localStorage:', error);
+                document.getElementById('logsContent').innerHTML = '<p class="error">Error loading logs</p>';
+                hideLoading();
+            }
+        }
+
+        // Display logs in the UI
+        function displayLogs(logs) {
+            const logsContent = document.getElementById('logsContent');
+            
+            if (logs.length === 0) {
+                logsContent.innerHTML = `
+                    <div class="no-logs">
+                        <i class="fas fa-file-alt" style="font-size: 3rem; margin-bottom: 1rem; color: #d1d5db;"></i>
+                        <h3>No logs found</h3>
+                        <p>Start using the visa checker to generate logs</p>
+                    </div>
+                `;
+                return;
+            }
+
+            logsContent.innerHTML = logs.map(log => `
+                <div class="log-entry ${log.type.toLowerCase()}">
+                    <div class="log-timestamp">${new Date(log.timestamp).toLocaleString()}</div>
+                    <div class="log-type ${log.type.toLowerCase()}">${log.type}</div>
+                    ${log.ip ? `<div class="log-ip" style="color: #6b7280; font-size: 0.8rem; margin-bottom: 0.5rem;">IP: ${log.ip}</div>` : ''}
+                    <div class="log-data">${JSON.stringify(log.data, null, 2)}</div>
+                </div>
+            `).join('');
+        }
+
+        // Update statistics from server
+        async function updateStatsFromServer() {
+            try {
+                const response = await fetch(`${SERVER_CONFIG.baseUrl}${SERVER_CONFIG.endpoints.stats}`);
+                
+                if (response.ok) {
+                    const stats = await response.json();
+                    const totalCount = stats.totalRequests + stats.totalResponses + stats.totalErrors;
+                    
+                    document.getElementById('stats').innerHTML = `
+                        <div class="stat-card">
+                            <div class="stat-number">${totalCount}</div>
+                            <div class="stat-label">Total Logs</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${stats.totalRequests}</div>
+                            <div class="stat-label">Requests</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${stats.totalResponses}</div>
+                            <div class="stat-label">Responses</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${stats.totalErrors}</div>
+                            <div class="stat-label">Errors</div>
+                        </div>
+                        ${stats.requestLogSizeMB ? `
+                        <div class="stat-card">
+                            <div class="stat-number">${stats.requestLogSizeMB}</div>
+                            <div class="stat-label">Log Size (MB)</div>
+                        </div>
+                        ` : ''}
+                    `;
+                } else {
+                    // Fallback to localStorage stats
+                    updateStatsFromLocalStorage(currentLogs);
+                }
+            } catch (error) {
+                console.error('Error loading stats from server:', error);
+                // Fallback to localStorage stats
+                updateStatsFromLocalStorage(currentLogs);
+            }
+        }
+
+        // Update statistics from localStorage
+        function updateStatsFromLocalStorage(logs) {
+            const requestCount = logs.filter(log => log.type === 'REQUEST').length;
+            const responseCount = logs.filter(log => log.type === 'RESPONSE').length;
+            const errorCount = logs.filter(log => log.type === 'ERROR').length;
+            const totalCount = logs.length;
+            
+            document.getElementById('stats').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${totalCount}</div>
+                    <div class="stat-label">Total Logs</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${requestCount}</div>
+                    <div class="stat-label">Requests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${responseCount}</div>
+                    <div class="stat-label">Responses</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${errorCount}</div>
+                    <div class="stat-label">Errors</div>
+                </div>
+            `;
+        }
+
         // Refresh logs
         function refreshLogs() {
+            currentOffset = 0;
             loadLogs();
         }
-        
+
         // Export logs
-        function exportLogs() {
+        async function exportLogs() {
+            try {
+                // Try to export from server first
+                const response = await fetch(`${SERVER_CONFIG.baseUrl}${SERVER_CONFIG.endpoints.export}`, {
+                    method: 'GET'
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `visa_logs_${new Date().toISOString().split('T')[0]}.jsonl`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    alert('Logs exported from server successfully!');
+                } else {
+                    // Fallback to localStorage export
+                    exportLogsFromLocalStorage();
+                }
+            } catch (error) {
+                console.error('Error exporting logs from server:', error);
+                // Fallback to localStorage export
+                exportLogsFromLocalStorage();
+            }
+        }
+
+        // Fallback: Export logs from localStorage
+        function exportLogsFromLocalStorage() {
             try {
                 const logs = JSON.parse(localStorage.getItem('visaLogs') || '[]');
                 const logText = logs.map(log => 
@@ -314,28 +433,66 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `visa_logs_${new Date().toISOString().split('T')[0]}.log`;
+                a.download = `visa_logs_local_${new Date().toISOString().split('T')[0]}.log`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
                 
-                alert('Logs exported successfully!');
+                alert('Logs exported from localStorage successfully!');
             } catch (error) {
-                console.error('Error exporting logs:', error);
+                console.error('Error exporting logs from localStorage:', error);
                 alert('Error exporting logs: ' + error.message);
             }
         }
-        
-        // Clear all logs
-        function clearLogs() {
+
+        // Clear logs
+        async function clearLogs() {
             if (confirm('Are you sure you want to clear all logs? This action cannot be undone.')) {
-                localStorage.removeItem('visaLogs');
-                loadLogs();
-                alert('All logs cleared successfully!');
+                try {
+                    // Try to clear from server first
+                    const response = await fetch(`${SERVER_CONFIG.baseUrl}${SERVER_CONFIG.endpoints.logs}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ type: 'ALL' })
+                    });
+
+                    if (response.ok) {
+                        alert('Logs cleared from server successfully!');
+                    } else {
+                        // Fallback to localStorage clear
+                        localStorage.removeItem('visaLogs');
+                        alert('Logs cleared from localStorage successfully!');
+                    }
+                    
+                    loadLogs();
+                } catch (error) {
+                    console.error('Error clearing logs:', error);
+                    // Fallback to localStorage clear
+                    localStorage.removeItem('visaLogs');
+                    alert('Logs cleared from localStorage successfully!');
+                    loadLogs();
+                }
             }
         }
-        
+
+        // Show loading state
+        function showLoading() {
+            document.getElementById('logsContent').innerHTML = `
+                <div class="no-logs">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 3rem; margin-bottom: 1rem; color: #3b82f6;"></i>
+                    <h3>Loading logs...</h3>
+                </div>
+            `;
+        }
+
+        // Hide loading state
+        function hideLoading() {
+            // Loading state is cleared when logs are displayed
+        }
+
         // Load logs when page loads
         document.addEventListener('DOMContentLoaded', loadLogs);
     </script>
