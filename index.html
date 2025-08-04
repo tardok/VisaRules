@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visa Requirements Checker | Global Travel Solutions</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Header -->
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-logo">
+                    <i class="fas fa-globe"></i>
+                    <span>GlobalVisa</span>
+                </div>
+                <div class="nav-links">
+                    <a href="#" class="nav-link">Home</a>
+                    <a href="#" class="nav-link">Services</a>
+                    <a href="#" class="nav-link">About</a>
+                    <a href="#" class="nav-link">Contact</a>
+                    <a href="logs.html" class="nav-link admin-link" title="Admin Panel">
+                        <i class="fas fa-cog"></i>
+                        Admin
+                    </a>
+                    <button onclick="exportLogs()" class="nav-link export-btn" title="Export Logs">
+                        <i class="fas fa-download"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Visa Requirements <span class="highlight">Checker</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Get instant visa information for your international travel. 
+                    Professional, reliable, and up-to-date visa requirements for destinations worldwide.
+                </p>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-wrapper">
+                <!-- Form Section -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <h2>Check Your Visa Requirements</h2>
+                        <p>Select your nationality and destination to get detailed visa information</p>
+                    </div>
+                    
+                    <form id="visaForm" class="visa-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="passport">Your Nationality</label>
+                                <div class="select-wrapper">
+                                    <select id="passport" name="passport" required>
+                                        <option value="">Select your passport country</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="destination">Travel Destination</label>
+                                <div class="select-wrapper">
+                                    <select id="destination" name="destination" required>
+                                        <option value="">Select destination country</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-search"></i>
+                            Check Visa Requirements
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loading" class="loading hidden">
+                    <div class="loading-content">
+                        <div class="spinner"></div>
+                        <h3>Checking Visa Requirements</h3>
+                        <p>Please wait while we retrieve the latest information...</p>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div id="result" class="result-section hidden">
+                    <div class="result-header">
+                        <h2>Visa Requirements</h2>
+                        <div class="trip-info">
+                            <div class="trip-route">
+                                <span class="country" id="tripFrom"></span>
+                                <i class="fas fa-arrow-right"></i>
+                                <span class="country" id="tripTo"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="resultContent" class="result-content">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Error State -->
+                <div id="error" class="error-section hidden">
+                    <div class="error-content">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Error</h3>
+                        <p id="errorMessage"></p>
+                        <button class="retry-btn" onclick="location.reload()">
+                            <i class="fas fa-redo"></i>
+                            Try Again
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>GlobalVisa</h4>
+                    <p>Professional visa requirement checking for global travelers.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Powered By</h4>
+                    <a href="https://travel-buddy.ai/api/" target="_blank" class="footer-link">
+                        Travel Buddy API
+                    </a>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>info@globalvisa.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 GlobalVisa. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 

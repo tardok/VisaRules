@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visa Checker Logs | Admin Panel</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .logs-container {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .logs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .logs-controls {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+        
+        .btn.danger {
+            background: #dc2626;
+        }
+        
+        .btn.danger:hover {
+            background: #b91c1c;
+        }
+        
+        .log-entry {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .log-entry.request {
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .log-entry.response {
+            border-left: 4px solid #16a34a;
+        }
+        
+        .log-entry.error {
+            border-left: 4px solid #dc2626;
+        }
+        
+        .log-timestamp {
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .log-type {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .log-type.request {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .log-type.response {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .log-type.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .log-data {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            padding: 1rem;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        
+        .no-logs {
+            text-align: center;
+            color: #6b7280;
+            padding: 3rem;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Header -->
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-logo">
+                    <i class="fas fa-globe"></i>
+                    <span>GlobalVisa</span>
+                </div>
+                <div class="nav-links">
+                    <a href="index.html" class="nav-link">Back to App</a>
+                    <button onclick="exportLogs()" class="nav-link export-btn" title="Export Logs">
+                        <i class="fas fa-download"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-wrapper">
+                <div class="section-header">
+                    <h1>Visa Checker Logs</h1>
+                    <p>Administrative panel for viewing and managing application logs</p>
+                </div>
+
+                <!-- Statistics -->
+                <div class="stats" id="stats">
+                    <!-- Stats will be populated here -->
+                </div>
+
+                <!-- Logs Container -->
+                <div class="logs-container">
+                    <div class="logs-header">
+                        <h2>Recent Logs</h2>
+                        <div class="logs-controls">
+                            <button class="btn" onclick="refreshLogs()">
+                                <i class="fas fa-refresh"></i>
+                                Refresh
+                            </button>
+                            <button class="btn" onclick="exportLogs()">
+                                <i class="fas fa-download"></i>
+                                Export
+                            </button>
+                            <button class="btn danger" onclick="clearLogs()">
+                                <i class="fas fa-trash"></i>
+                                Clear All
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="logsContent">
+                        <!-- Logs will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>GlobalVisa</h4>
+                    <p>Administrative panel for visa requirements checker.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Log Management</h4>
+                    <p>View and export application logs for monitoring and debugging.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>admin@globalvisa.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 GlobalVisa. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Load and display logs
+        function loadLogs() {
+            try {
+                const logs = JSON.parse(localStorage.getItem('visaLogs') || '[]');
+                const logsContent = document.getElementById('logsContent');
+                const stats = document.getElementById('stats');
+                
+                // Update statistics
+                const requestCount = logs.filter(log => log.type === 'REQUEST').length;
+                const responseCount = logs.filter(log => log.type === 'RESPONSE').length;
+                const errorCount = logs.filter(log => log.type === 'ERROR').length;
+                const totalCount = logs.length;
+                
+                stats.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-number">${totalCount}</div>
+                        <div class="stat-label">Total Logs</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${requestCount}</div>
+                        <div class="stat-label">Requests</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${responseCount}</div>
+                        <div class="stat-label">Responses</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${errorCount}</div>
+                        <div class="stat-label">Errors</div>
+                    </div>
+                `;
+                
+                if (logs.length === 0) {
+                    logsContent.innerHTML = `
+                        <div class="no-logs">
+                            <i class="fas fa-file-alt" style="font-size: 3rem; margin-bottom: 1rem; color: #d1d5db;"></i>
+                            <h3>No logs found</h3>
+                            <p>Start using the visa checker to generate logs</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Display logs in reverse chronological order
+                const sortedLogs = logs.slice().reverse();
+                logsContent.innerHTML = sortedLogs.map(log => `
+                    <div class="log-entry ${log.type.toLowerCase()}">
+                        <div class="log-timestamp">${new Date(log.timestamp).toLocaleString()}</div>
+                        <div class="log-type ${log.type.toLowerCase()}">${log.type}</div>
+                        <div class="log-data">${JSON.stringify(log.data, null, 2)}</div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading logs:', error);
+                document.getElementById('logsContent').innerHTML = `
+                    <div class="no-logs">
+                        <h3>Error loading logs</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Refresh logs
+        function refreshLogs() {
+            loadLogs();
+        }
+        
+        // Export logs
+        function exportLogs() {
+            try {
+                const logs = JSON.parse(localStorage.getItem('visaLogs') || '[]');
+                const logText = logs.map(log => 
+                    `[${log.timestamp}] ${log.type}: ${JSON.stringify(log.data, null, 2)}`
+                ).join('\n\n');
+                
+                const blob = new Blob([logText], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `visa_logs_${new Date().toISOString().split('T')[0]}.log`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                alert('Logs exported successfully!');
+            } catch (error) {
+                console.error('Error exporting logs:', error);
+                alert('Error exporting logs: ' + error.message);
+            }
+        }
+        
+        // Clear all logs
+        function clearLogs() {
+            if (confirm('Are you sure you want to clear all logs? This action cannot be undone.')) {
+                localStorage.removeItem('visaLogs');
+                loadLogs();
+                alert('All logs cleared successfully!');
+            }
+        }
+        
+        // Load logs when page loads
+        document.addEventListener('DOMContentLoaded', loadLogs);
+    </script>
+</body>
+</html> 
