@@ -68,7 +68,7 @@ function updateStats(type) {
 // API endpoint to receive logs
 app.post('/api/logs', (req, res) => {
     try {
-        const { type, data } = req.body;
+        const { type, data, username } = req.body;
         
         if (!type || !data) {
             return res.status(400).json({ 
@@ -76,11 +76,12 @@ app.post('/api/logs', (req, res) => {
                 error: 'Missing required fields: type and data' 
             });
         }
-
+        
         const logEntry = {
             timestamp: new Date().toISOString(),
             type: type,
             data: data,
+            username: username || 'anonymous',
             userAgent: req.headers['user-agent'],
             ip: req.ip || req.connection.remoteAddress,
             requestId: Math.random().toString(36).substr(2, 9)

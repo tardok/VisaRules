@@ -1,3 +1,23 @@
+// Authentication check
+let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+if (!currentUser) {
+    window.location.href = 'index.html';
+}
+
+// Display current user
+document.addEventListener('DOMContentLoaded', function() {
+    const currentUserElement = document.getElementById('currentUser');
+    if (currentUserElement && currentUser) {
+        currentUserElement.textContent = `Welcome, ${currentUser.username}`;
+    }
+});
+
+// Logout function
+function logout() {
+    localStorage.removeItem('currentUser');
+    window.location.href = 'index.html';
+}
+
 // API Configuration
 const API_CONFIG = {
     baseUrl: 'https://visa-requirement.p.rapidapi.com',
@@ -30,7 +50,8 @@ async function logRequest(requestData) {
     const logEntry = {
         timestamp: new Date().toISOString(),
         type: 'REQUEST',
-        data: requestData
+        data: requestData,
+        username: currentUser ? currentUser.username : 'anonymous'
     };
     
     try {
@@ -42,7 +63,8 @@ async function logRequest(requestData) {
             },
             body: JSON.stringify({
                 type: 'REQUEST',
-                data: requestData
+                data: requestData,
+                username: currentUser ? currentUser.username : 'anonymous'
             })
         });
 
@@ -64,7 +86,8 @@ async function logResponse(responseData) {
     const logEntry = {
         timestamp: new Date().toISOString(),
         type: 'RESPONSE',
-        data: responseData
+        data: responseData,
+        username: currentUser ? currentUser.username : 'anonymous'
     };
     
     try {
@@ -76,7 +99,8 @@ async function logResponse(responseData) {
             },
             body: JSON.stringify({
                 type: 'RESPONSE',
-                data: responseData
+                data: responseData,
+                username: currentUser ? currentUser.username : 'anonymous'
             })
         });
 
@@ -98,7 +122,8 @@ async function logError(errorData) {
     const logEntry = {
         timestamp: new Date().toISOString(),
         type: 'ERROR',
-        data: errorData
+        data: errorData,
+        username: currentUser ? currentUser.username : 'anonymous'
     };
     
     try {
@@ -110,7 +135,8 @@ async function logError(errorData) {
             },
             body: JSON.stringify({
                 type: 'ERROR',
-                data: errorData
+                data: errorData,
+                username: currentUser ? currentUser.username : 'anonymous'
             })
         });
 

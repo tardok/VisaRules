@@ -259,7 +259,7 @@
                     const data = await response.json();
                     currentLogs = data.logs;
                     displayLogs(currentLogs);
-                    updateStatsFromServer();
+                    updateStatsFromServer(currentLogs);
                     hideLoading();
                 } else {
                     // Fallback to localStorage
@@ -307,6 +307,9 @@
                 <div class="log-entry ${log.type.toLowerCase()}">
                     <div class="log-timestamp">${new Date(log.timestamp).toLocaleString()}</div>
                     <div class="log-type ${log.type.toLowerCase()}">${log.type}</div>
+                    <div class="log-user" style="color: #1e40af; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                        <i class="fas fa-user"></i> User: ${log.username || 'anonymous'}
+                    </div>
                     ${log.ip ? `<div class="log-ip" style="color: #6b7280; font-size: 0.8rem; margin-bottom: 0.5rem;">IP: ${log.ip}</div>` : ''}
                     <div class="log-data">${JSON.stringify(log.data, null, 2)}</div>
                 </div>
@@ -314,13 +317,17 @@
         }
 
         // Update statistics from server
-        async function updateStatsFromServer() {
+        async function updateStatsFromServer(logs) {
             try {
                 const response = await fetch(`${SERVER_CONFIG.baseUrl}${SERVER_CONFIG.endpoints.stats}`);
                 
                 if (response.ok) {
                     const stats = await response.json();
                     const totalCount = stats.totalRequests + stats.totalResponses + stats.totalErrors;
+                    
+                    // Count unique users
+                    const uniqueUsers = new Set(logs.filter(log => log.username && log.username !== 'anonymous').map(log => log.username));
+                    const userCount = uniqueUsers.size;
                     
                     document.getElementById('stats').innerHTML = `
                         <div class="stat-card">
@@ -339,6 +346,10 @@
                             <div class="stat-number">${stats.totalErrors}</div>
                             <div class="stat-label">Errors</div>
                         </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${userCount}</div>
+                            <div class="stat-label">Active Users</div>
+                        </div>
                         ${stats.requestLogSizeMB ? `
                         <div class="stat-card">
                             <div class="stat-number">${stats.requestLogSizeMB}</div>
@@ -348,12 +359,12 @@
                     `;
                 } else {
                     // Fallback to localStorage stats
-                    updateStatsFromLocalStorage(currentLogs);
+                    updateStatsFromLocalStorage(logs);
                 }
             } catch (error) {
                 console.error('Error loading stats from server:', error);
                 // Fallback to localStorage stats
-                updateStatsFromLocalStorage(currentLogs);
+                updateStatsFromLocalStorage(logs);
             }
         }
 
@@ -363,6 +374,10 @@
             const responseCount = logs.filter(log => log.type === 'RESPONSE').length;
             const errorCount = logs.filter(log => log.type === 'ERROR').length;
             const totalCount = logs.length;
+            
+            // Count unique users
+            const uniqueUsers = new Set(logs.filter(log => log.username && log.username !== 'anonymous').map(log => log.username));
+            const userCount = uniqueUsers.size;
             
             document.getElementById('stats').innerHTML = `
                 <div class="stat-card">
@@ -380,6 +395,10 @@
                 <div class="stat-card">
                     <div class="stat-number">${errorCount}</div>
                     <div class="stat-label">Errors</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${userCount}</div>
+                    <div class="stat-label">Active Users</div>
                 </div>
             `;
         }

@@ -1,107 +1,141 @@
-# Visa Requirements Checker
+# GlobalVisa - Visa Requirements Checker
 
-A modern, responsive web application that allows users to check visa requirements for international travel using the Travel Buddy API. Now with **server-side logging** to collect logs from all users in centralized files.
+A professional web application for checking visa requirements using the Travel Buddy API. Features user authentication, comprehensive logging, and an admin panel.
 
 ## Features
 
-- **Easy-to-use Interface**: Clean, modern design with intuitive dropdown selections
-- **Comprehensive Country List**: Includes all major countries with ISO codes
-- **Real-time API Integration**: Connects to Travel Buddy's visa requirements API
-- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
-- **Visual Status Indicators**: Color-coded visa status with appropriate icons
-- **Error Handling**: User-friendly error messages and loading states
-- **Server-Side Logging**: Centralized logging system that collects data from all users
-- **Capital City Information**: Displays destination country's capital city and additional details
-- **Advanced Log Management**: Admin panel for viewing, exporting, and managing application logs
-- **Fallback Support**: Graceful degradation to localStorage when server is unavailable
+- **User Authentication**: Simple username/password registration and login system
+- **Visa Requirements Checker**: Check visa requirements for any nationality to destination combination
+- **Real-time API Integration**: Uses Travel Buddy API for up-to-date visa information
+- **Visual Status Indicators**: Happy person for visa-free travel, sad tiger for visa requirements
+- **Comprehensive Logging**: Server-side logging with user tracking
+- **Admin Panel**: View logs, statistics, and export data
+- **Responsive Design**: Works on desktop and mobile devices
+- **Professional UI**: Inspired by Vialto Partners design aesthetic
 
-## How It Works
+## Security Notice
 
-1. **Select Nationality**: Choose your passport country from the dropdown
-2. **Select Destination**: Choose your travel destination country
-3. **Check Requirements**: Click the button to get instant visa information
-4. **View Results**: See detailed visa requirements with additional information
+⚠️ **IMPORTANT**: This is a prototype application. Do not use real usernames or passwords. Your credentials are stored locally and are not secure.
 
-## Visa Status Types
+## Installation
 
-The application displays different visa statuses with color-coded indicators:
+### Prerequisites
+- Node.js (version 14 or higher)
+- npm (comes with Node.js)
 
-- 🔴 **Red** - Visa Required
-- 🟢 **Green** - Visa Not Required  
-- 🔵 **Blue** - Visa on Arrival Available
-- 🟡 **Yellow** - Electronic Travel Authorization (eTA) Required
+### Setup Instructions
 
-## API Integration
+1. **Clone or download the project files**
 
-This application uses the [Travel Buddy Visa Requirements API](https://travel-buddy.ai/api/) through RapidAPI. The API provides:
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-- Real-time visa requirement data
-- Detailed information about visa types
-- Stay duration information
-- Additional notes and requirements
+3. **Start the server**:
+   ```bash
+   npm start
+   ```
 
-### API Endpoint
-- **URL**: `https://visa-requirement.p.rapidapi.com/visa-check`
-- **Method**: POST
-- **Headers**: 
-  - `X-RapidAPI-Key`: Your RapidAPI key
-  - `X-RapidAPI-Host`: `visa-requirement.p.rapidapi.com`
-  - `Content-Type`: `application/x-www-form-urlencoded`
+4. **Access the application**:
+   - Open your browser and go to `http://localhost:3000`
+   - You'll be redirected to the login page (`index.html`)
+
+## Usage
+
+### For Users
+
+1. **Registration**:
+   - Click "Register here" on the login page
+   - Create a username (minimum 3 characters) and password (minimum 6 characters)
+   - Read and acknowledge the security warning
+   - Click "Register"
+
+2. **Login**:
+   - Enter your username and password
+   - Click "Login"
+
+3. **Check Visa Requirements**:
+   - Select your nationality from the dropdown
+   - Select your destination country
+   - Click "Check Visa Requirements"
+   - View the results with visual indicators
+
+4. **Logout**:
+   - Click the "Logout" button in the top navigation
+
+### For Administrators
+
+1. **Access Admin Panel**:
+   - Click the "Admin" link in the navigation bar
+   - Or go directly to `http://localhost:3000/logs.html`
+
+2. **View Logs**:
+   - See all user requests and API responses
+   - View user information for each log entry
+   - Check statistics including active user count
+
+3. **Export Logs**:
+   - Click the export button (download icon) in the navigation
+   - Or use the "Export Logs" button in the admin panel
+
+4. **Clear Logs**:
+   - Use the "Clear All" button in the admin panel
 
 ## File Structure
 
 ```
 VisaRules/
-├── index.html          # Main application interface
-├── styles.css          # CSS styling and responsive design
-├── script.js           # JavaScript functionality and API integration
-├── logs.html           # Administrative log viewer and management panel
-├── server.js           # Node.js/Express server for server-side logging
-├── package.json        # Node.js dependencies and scripts
-├── logs/               # Server log files (created automatically)
-│   ├── visa_requests.jsonl  # Request and response logs
-│   ├── visa_errors.jsonl    # Error logs
-│   └── stats.json           # Statistics file
-└── README.md           # Project documentation
+├── index.html          # Login/Registration page
+├── app.html            # Main application page
+├── logs.html           # Admin panel
+├── styles.css          # All styling
+├── script.js           # Main application logic
+├── auth.js             # Authentication logic
+├── server.js           # Node.js server for logging
+├── package.json        # Dependencies and scripts
+├── install.bat         # Windows installation script
+├── install.sh          # Unix/Linux installation script
+└── .gitignore          # Git ignore rules
 ```
 
-## Setup and Usage
+## API Configuration
 
-### Prerequisites
-- A modern web browser
-- Internet connection for API calls
-- RapidAPI account (free tier available)
-- **For server-side logging**: Node.js (version 14 or higher)
+The application uses the Travel Buddy Visa Requirements API:
+- **Base URL**: `https://visa-requirement.p.rapidapi.com`
+- **API Key**: Included in the code (for demo purposes)
+- **Headers**: X-RapidAPI-Key and X-RapidAPI-Host
 
-### Installation Options
+## Logging System
 
-#### Option 1: Server-Side Logging (Recommended)
-1. **Install Node.js** from [nodejs.org](https://nodejs.org/)
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
-3. **Start the server**:
-   ```bash
-   npm start
-   ```
-4. **Open the application** at `http://localhost:3000`
+### Server-side Logging
+- Logs are stored in JSONL format in the `logs/` directory
+- Separate files for requests, responses, and errors
+- Includes user information, timestamps, and IP addresses
+- Automatic log rotation and size management
 
-#### Option 2: Client-Side Only
-1. **Open `index.html`** directly in a web browser
-2. **Use the application** with localStorage logging only
+### Log Files
+- `visa_requests.jsonl`: All API requests and responses
+- `visa_errors.jsonl`: Error logs
+- `stats.json`: Application statistics
 
-**Note**: Server-side logging provides centralized log collection from all users, while client-side only stores logs locally in the browser.
+## User Data Storage
 
-### API Key Setup
-The application is pre-configured with a RapidAPI key. To use your own:
+- **User Accounts**: Stored in browser localStorage (not secure for production)
+- **Session Management**: Current user session stored in localStorage
+- **Logs**: Stored on server in JSONL files
 
-1. Sign up at [RapidAPI](https://rapidapi.com/)
-2. Subscribe to the [Travel Buddy API](https://rapidapi.com/TravelBuddyAI/api/visa-requirement/)
-3. Replace the API key in `script.js`:
-   ```javascript
-   'X-RapidAPI-Key': 'your-api-key-here'
-   ```
+## Development
+
+### Running in Development Mode
+```bash
+npm run dev
+```
+
+### Adding New Features
+1. Frontend changes: Edit HTML, CSS, or JavaScript files
+2. Backend changes: Modify `server.js` for new API endpoints
+3. Styling: Update `styles.css` following the Vialto Partners design system
 
 ## Browser Compatibility
 
@@ -109,93 +143,39 @@ The application is pre-configured with a RapidAPI key. To use your own:
 - Firefox
 - Safari
 - Edge
-- Mobile browsers
 
-## Technologies Used
+## Troubleshooting
 
-- **HTML5**: Semantic markup and structure
-- **CSS3**: Modern styling with Flexbox and Grid
-- **JavaScript (ES6+)**: Async/await, Fetch API, DOM manipulation
-- **Font Awesome**: Icons for better UX
-- **Google Fonts**: Inter font family for typography
+### Common Issues
 
-## Server-Side Logging
+1. **Server won't start**:
+   - Check if Node.js is installed: `node --version`
+   - Ensure port 3000 is not in use
+   - Run `npm install` to install dependencies
 
-The application now includes a comprehensive server-side logging system that collects data from all users in centralized files.
+2. **API errors**:
+   - Check internet connection
+   - Verify API key is valid
+   - Check browser console for error details
 
-### Features
-- **Centralized Storage**: All logs are stored in server files, not just browser localStorage
-- **Multi-User Support**: Collects logs from all users accessing the application
-- **Automatic Fallback**: Gracefully falls back to localStorage if server is unavailable
-- **Real-time Statistics**: Live statistics and file size monitoring
-- **Export Capabilities**: Download logs in JSONL format for analysis
+3. **Logs not appearing**:
+   - Ensure server is running
+   - Check `logs/` directory exists
+   - Verify file permissions
 
-### Log Files
-The server creates the following log files in the `logs/` directory:
-- **`visa_requests.jsonl`**: All requests and responses (JSON Lines format)
-- **`visa_errors.jsonl`**: All error logs
-- **`stats.json`**: Real-time statistics and counters
+### Getting Help
 
-### Log Entry Structure
-Each log entry includes:
-- **Timestamp**: ISO format timestamp
-- **Type**: REQUEST, RESPONSE, or ERROR
-- **Data**: Detailed information about the operation
-- **User Agent**: Browser and device information
-- **IP Address**: User's IP address (for server logs)
-- **Request ID**: Unique identifier for each request
-
-### API Endpoints
-The server provides the following endpoints:
-- **`POST /api/logs`**: Submit new log entries
-- **`GET /api/logs`**: Retrieve logs with pagination
-- **`GET /api/stats`**: Get real-time statistics
-- **`GET /api/logs/export`**: Export logs as downloadable files
-- **`DELETE /api/logs`**: Clear all logs
-
-### Admin Panel
-Access the admin panel at `http://localhost:3000/logs.html` to:
-- View real-time logs from all users
-- Monitor statistics and file sizes
-- Export logs in various formats
-- Clear logs when needed
-
-### Fallback Support
-If the server is unavailable, the application automatically:
-- Falls back to localStorage logging
-- Continues to function normally
-- Attempts to reconnect to server on next request
-- Provides clear feedback about connection status
-
-## API Rate Limits
-
-The Travel Buddy API offers:
-- **Free Tier**: 600 requests per month
-- **Paid Plans**: Starting at $4.99/month for 3,000 requests
-
-## Contributing
-
-Feel free to contribute to this project by:
-- Reporting bugs
-- Suggesting new features
-- Improving the UI/UX
-- Adding more countries or features
+- Check the browser console for error messages
+- Review server logs in the terminal
+- Ensure all files are in the correct directory structure
 
 ## License
 
-This project is open source and available under the MIT License.
+This is a prototype application for demonstration purposes.
 
-## Support
+## Credits
 
-For API-related issues, contact Travel Buddy support at their [official website](https://travel-buddy.ai/api/).
-
-For application issues, please check the browser console for error messages or contact the development team.
-
-## Future Enhancements
-
-- [ ] Add visa application links
-- [ ] Include travel advisories
-- [ ] Add passport validity requirements
-- [ ] Implement country search functionality
-- [ ] Add travel history tracking
-- [ ] Include multiple destination planning
+- **API**: Travel Buddy Visa Requirements API
+- **Design Inspiration**: Vialto Partners
+- **Icons**: Font Awesome
+- **Fonts**: Inter (Google Fonts)
