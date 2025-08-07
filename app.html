@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visa Requirements Checker | Global Travel Solutions</title>
+    <title>Business Travel Compliance Hub | GlobalVisa</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -44,121 +44,104 @@
         <section class="hero">
             <div class="hero-content">
                 <h1 class="hero-title">
-                    Visa Requirements <span class="highlight">Checker</span>
+                    Your End to End <span class="highlight">Business Travel Compliance Hub</span>
                 </h1>
                 <p class="hero-subtitle">
-                    Get instant visa information for your international travel. 
-                    Professional, reliable, and up-to-date visa requirements for destinations worldwide.
+                    Streamline your international business travel with our comprehensive compliance tools. 
+                    From visa requirements to tax obligations, we've got you covered.
                 </p>
             </div>
         </section>
 
-        <!-- Main Content -->
+        <!-- Services Grid -->
         <main class="main-content">
             <div class="content-wrapper">
-                <!-- Form Section -->
-                <div class="form-section">
-                    <div class="section-header">
-                        <h2>Check Your Visa Requirements</h2>
-                        <p>Select your nationality and destination to get detailed visa information</p>
-                    </div>
-                    
-                    <form id="visaForm" class="visa-form">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="passport">Your Nationality</label>
-                                <div class="select-wrapper">
-                                    <select id="passport" name="passport" required>
-                                        <option value="">Select your passport country</option>
-                                    </select>
-                                    <i class="fas fa-chevron-down"></i>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="destination">Travel Destination</label>
-                                <div class="select-wrapper">
-                                    <select id="destination" name="destination" required>
-                                        <option value="">Select destination country</option>
-                                    </select>
-                                    <i class="fas fa-chevron-down"></i>
-                                </div>
-                            </div>
+                <div class="services-grid">
+                    <!-- Visa Requirements Checker -->
+                    <div class="service-card" onclick="navigateToService('visa')">
+                        <div class="service-icon">
+                            <i class="fas fa-passport"></i>
                         </div>
-
-                        <button type="submit" class="submit-btn">
-                            <i class="fas fa-search"></i>
-                            Check Visa Requirements
+                        <h3>Visa Requirements Checker</h3>
+                        <p>Get instant visa information for your international travel. Check requirements, processing times, and documentation needed.</p>
+                        <div class="service-features">
+                            <span class="feature-tag">Real-time API</span>
+                            <span class="feature-tag">Global Coverage</span>
+                            <span class="feature-tag">Instant Results</span>
+                        </div>
+                        <button class="service-btn">
+                            <i class="fas fa-arrow-right"></i>
+                            Access Tool
                         </button>
-                    </form>
-                </div>
-
-                <!-- Loading State -->
-                <div id="loading" class="loading hidden">
-                    <div class="loading-content">
-                        <div class="spinner"></div>
-                        <h3>Checking Visa Requirements</h3>
-                        <p>Please wait while we retrieve the latest information...</p>
                     </div>
-                </div>
 
-                <!-- Results Section -->
-                <div id="result" class="result-section hidden">
-                    <div class="result-header">
-                        <h2>Visa Requirements</h2>
-                        <div class="trip-info">
-                            <div class="trip-route">
-                                <span class="country" id="tripFrom"></span>
-                                <i class="fas fa-arrow-right"></i>
-                                <span class="country" id="tripTo"></span>
-                            </div>
+                    <!-- Posted Worker Requirements Checker -->
+                    <div class="service-card" onclick="navigateToService('posted-worker')">
+                        <div class="service-icon">
+                            <i class="fas fa-users"></i>
                         </div>
+                        <h3>Posted Worker Requirements Checker</h3>
+                        <p>Comprehensive tool for checking posted worker requirements and compliance across different jurisdictions.</p>
+                        <div class="service-features">
+                            <span class="feature-tag">Coming Soon</span>
+                            <span class="feature-tag">EU Compliance</span>
+                            <span class="feature-tag">Worker Rights</span>
+                        </div>
+                        <button class="service-btn disabled">
+                            <i class="fas fa-clock"></i>
+                            Coming Soon
+                        </button>
                     </div>
-                    
-                    <div id="resultContent" class="result-content">
-                        <!-- Results will be populated here -->
-                    </div>
-                </div>
 
-                <!-- Error State -->
-                <div id="error" class="error-section hidden">
-                    <div class="error-content">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h3>Error</h3>
-                        <p id="errorMessage"></p>
-                        <button class="retry-btn" onclick="location.reload()">
-                            <i class="fas fa-redo"></i>
-                            Try Again
+                    <!-- Tax Requirements Checker -->
+                    <div class="service-card" onclick="navigateToService('tax')">
+                        <div class="service-icon">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                        <h3>Tax Requirements Checker</h3>
+                        <p>Navigate complex international tax requirements and obligations for business travelers and expatriates.</p>
+                        <div class="service-features">
+                            <span class="feature-tag">Coming Soon</span>
+                            <span class="feature-tag">Tax Compliance</span>
+                            <span class="feature-tag">Multi-jurisdiction</span>
+                        </div>
+                        <button class="service-btn disabled">
+                            <i class="fas fa-clock"></i>
+                            Coming Soon
                         </button>
                     </div>
                 </div>
+
+                <!-- Additional Info Section -->
+                <section class="info-section">
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h4>Secure & Reliable</h4>
+                            <p>Your data is protected with enterprise-grade security measures and encrypted transmission.</p>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fas fa-sync-alt"></i>
+                            </div>
+                            <h4>Always Up-to-Date</h4>
+                            <p>Our compliance databases are continuously updated to reflect the latest regulatory changes.</p>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <h4>24/7 Support</h4>
+                            <p>Get help whenever you need it with our comprehensive support system and documentation.</p>
+                        </div>
+                    </div>
+                </section>
             </div>
         </main>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>GlobalVisa</h4>
-                    <p>Professional visa requirement checking for global travelers.</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Powered By</h4>
-                    <a href="https://travel-buddy.ai/api/" target="_blank" class="footer-link">
-                        Travel Buddy API
-                    </a>
-                </div>
-                <div class="footer-section">
-                    <h4>Contact</h4>
-                    <p>info@globalvisa.com</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 GlobalVisa. All rights reserved.</p>
-            </div>
-        </footer>
     </div>
 
-    <script src="script.js"></script>
+    <script src="landing.js"></script>
 </body>
 </html> 

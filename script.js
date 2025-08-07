@@ -1,4 +1,5 @@
 // Authentication check
+let userProfile = JSON.parse(localStorage.getItem("userProfile") || "{}");
 let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
 if (!currentUser) {
     window.location.href = 'index.html';
@@ -9,6 +10,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const currentUserElement = document.getElementById('currentUser');
     if (currentUserElement && currentUser) {
         currentUserElement.textContent = `Welcome, ${currentUser.username}`;
+        
+        // Make username clickable
+        currentUserElement.addEventListener('click', function() {
+            window.location.href = 'profile.html';
+        });
     }
 });
 
@@ -446,6 +452,24 @@ const elements = {
 document.addEventListener('DOMContentLoaded', function() {
     populateCountrySelects();
     setupEventListeners();
+    
+    // Pre-populate nationality if available in profile (after countries are loaded)
+    if (userProfile.nationality) {
+        setTimeout(() => {
+            const passportSelect = document.getElementById("passport");
+            if (passportSelect) {
+                // Find the option with matching text content
+                const options = passportSelect.options;
+                for (let i = 0; i < options.length; i++) {
+                    if (options[i].textContent === userProfile.nationality) {
+                        passportSelect.value = options[i].value;
+                        console.log("Pre-populated nationality:", userProfile.nationality);
+                        break;
+                    }
+                }
+            }
+        }, 100); // Small delay to ensure countries are loaded
+    }
 });
 
 // Populate country select dropdowns
@@ -730,3 +754,4 @@ function showError(message) {
 function hideError() {
     elements.error.classList.add('hidden');
 } 
+
