@@ -61,7 +61,7 @@ async function logRequest(requestData) {
     };
     
     try {
-        // Send to server
+        // Send to server (Google Cloud Logging)
         const response = await fetch(`${SERVER_CONFIG.baseUrl}${SERVER_CONFIG.endpoints.logs}`, {
             method: 'POST',
             headers: {
@@ -75,7 +75,9 @@ async function logRequest(requestData) {
         });
 
         if (response.ok) {
-            console.log('📝 Logged Request to server:', logEntry);
+            const result = await response.json();
+            console.log('📝 Logged Request to Google Cloud:', logEntry);
+            console.log('📊 Server response:', result.message);
         } else {
             console.error('Failed to log request to server:', response.status);
             // Fallback to localStorage if server is unavailable
@@ -97,7 +99,7 @@ async function logResponse(responseData) {
     };
     
     try {
-        // Send to server
+        // Send to server (Google Cloud Logging)
         const response = await fetch(`${SERVER_CONFIG.baseUrl}${SERVER_CONFIG.endpoints.logs}`, {
             method: 'POST',
             headers: {
@@ -111,7 +113,9 @@ async function logResponse(responseData) {
         });
 
         if (response.ok) {
-            console.log('📝 Logged Response to server:', logEntry);
+            const result = await response.json();
+            console.log('📝 Logged Response to Google Cloud:', logEntry);
+            console.log('📊 Server response:', result.message);
         } else {
             console.error('Failed to log response to server:', response.status);
             // Fallback to localStorage if server is unavailable
@@ -133,7 +137,7 @@ async function logError(errorData) {
     };
     
     try {
-        // Send to server
+        // Send to server (Google Cloud Logging)
         const response = await fetch(`${SERVER_CONFIG.baseUrl}${SERVER_CONFIG.endpoints.logs}`, {
             method: 'POST',
             headers: {
@@ -147,7 +151,9 @@ async function logError(errorData) {
         });
 
         if (response.ok) {
-            console.log('📝 Logged Error to server:', logEntry);
+            const result = await response.json();
+            console.log('📝 Logged Error to Google Cloud:', logEntry);
+            console.log('📊 Server response:', result.message);
         } else {
             console.error('Failed to log error to server:', response.status);
             // Fallback to localStorage if server is unavailable
@@ -160,21 +166,21 @@ async function logError(errorData) {
     }
 }
 
-// Fallback function for when server is unavailable
+// Fallback to localStorage if server is unavailable
 function fallbackToLocalStorage(logEntry) {
     try {
-        const logs = JSON.parse(localStorage.getItem('visaLogs') || '[]');
+        let logs = JSON.parse(localStorage.getItem('visaLogs') || '[]');
         logs.push(logEntry);
         
-        // Keep only the last 100 entries to prevent localStorage overflow
+        // Keep only the last 100 entries to prevent localStorage from filling up
         if (logs.length > 100) {
-            logs.splice(0, logs.length - 100);
+            logs = logs.slice(-100);
         }
         
         localStorage.setItem('visaLogs', JSON.stringify(logs));
         console.log('📝 Fallback: Logged to localStorage:', logEntry);
     } catch (error) {
-        console.error('Error logging to localStorage:', error);
+        console.error('Error saving to localStorage:', error);
     }
 }
 
